@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 
 // Type the presets so they are { x: number; y: number; width: number; height: number }
 const PRESETS: Record<string, { x: number; y: number; width: number; height: number }> = {
@@ -17,6 +17,16 @@ export default function App() {
   const [latestText, setLatestText] = useState('');
   const [autoSubtitleText, setAutoSubtitleText] = useState('');
 
+
+  // A ref to always hold the latest `autoSubtitleOn` value
+  const autoSubtitleOnRef = useRef(autoSubtitleOn);
+
+
+  // Whenever autoSubtitleOn changes, sync the ref
+  useEffect(() => {
+    autoSubtitleOnRef.current = autoSubtitleOn;
+  }, [autoSubtitleOn]);
+
   // SSE setup
   useEffect(() => {
     const eventSource = new EventSource('http://localhost:3000/api/sse');
@@ -24,7 +34,13 @@ export default function App() {
       try {
         const data = JSON.parse(event.data);
         if (data.desktopOCR) setLatestText(data.desktopOCR);
-        if (data.autoSubtitle) setAutoSubtitleText(data.autoSubtitle);
+        // If we received auto-subtitle text...
+        if (data.autoSubtitle) {
+            // Only update state if auto-subtitle is actually on right now
+            if (autoSubtitleOnRef.current) {
+                setAutoSubtitleText(data.autoSubtitle);
+            }
+            }
       } catch (err) {
         console.error('Failed to parse SSE event:', err);
       }
