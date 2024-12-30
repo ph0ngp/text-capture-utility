@@ -1,0 +1,17 @@
+{
+    "compilerOptions": {
+      "target": "ESNext",            // or "ES2017", "ES2018", etc. — your preference
+      "module": "CommonJS",          // changed from "ESNext" to "CommonJS"
+      "moduleResolution": "Node",
+      "strict": true,
+      "esModuleInterop": true,
+      "skipLibCheck": true,
+      "forceConsistentCasingInFileNames": true,
+      "resolveJsonModule": true,
+      "isolatedModules": true,
+      "jsx": "react-jsx",
+      "lib": ["ESNext", "DOM"]
+    },
+    "include": ["src"]
+  }
+  
