@@ -37,7 +37,7 @@ export default function App() {
                 if (data.desktopOCR) setLatestText(data.desktopOCR)
                 // If we received auto-subtitle text...
                 if (data.autoSubtitle) {
-                    // Only update state if auto-subtitle is actually on right now
+                    // Only update state if auto-subtitle is actually on right now. So that after we turn it off, it clears and doesn't show the latest text.
                     if (autoSubtitleOnRef.current) {
                         setAutoSubtitleText(data.autoSubtitle)
                     }
@@ -83,6 +83,7 @@ export default function App() {
     }
 
     // Handle preset selection
+    // CY: All coordinates change only apply when we press "Turn ON Auto Subtitle"
     const handlePresetChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
         const selected = e.target.value as keyof typeof PRESETS // "macbook" | "4k"
         const preset = PRESETS[selected]
