@@ -42,6 +42,12 @@ export default function App() {
     const newState = !autoSubtitleOn;
     setAutoSubtitleOn(newState);
 
+      // If we're turning OFF auto subtitle
+  if (!newState) {
+    // Clear the auto subtitle text
+    setAutoSubtitleText('');
+  }
+
     try {
       await fetch('http://localhost:3000/api/auto-subtitle', {
         method: 'POST',
@@ -69,6 +75,11 @@ export default function App() {
     setH(preset.height);
   };
 
+    // Clear the latest OCR text
+    const clearLatestText = () => {
+        setLatestText('');
+      };
+
   return (
     <div>
       <pre className="reader_class">{latestText}</pre>
@@ -83,6 +94,8 @@ export default function App() {
           marginTop: '1rem',
         }}
       >
+
+      <button onClick={clearLatestText}>Clear</button>
         {/* Preset dropdown */}
         <label>
           Preset:
