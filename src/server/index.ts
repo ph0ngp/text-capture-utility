@@ -65,12 +65,11 @@ app.get('/api/sse', (req, res) => {
 })
 
 /**
- * Helper function: Broadcast new OCR text to all SSE clients.
+ * Helper function: Broadcast text to all SSE clients with specified event type.
  */
-function broadcastOCRText(text: string) {
+function broadcastText(text: string, eventType: 'desktopOCR' | 'autoSubtitle') {
     sseClients.forEach((client) => {
-        // SSE format: "data: <some JSON>\n\n"
-        client.write(`data: ${JSON.stringify({ desktopOCR: text })}\n\n`)
+        client.write(`data: ${JSON.stringify({ [eventType]: text })}\n\n`)
     })
 }
 
@@ -89,7 +88,7 @@ fs.watch(desktopPath, (eventType, filename) => {
         performOcr(screenshotFilePath, (recognizedText) => {
             console.log('Received OCR text:', recognizedText)
             // Broadcast to all SSE listeners
-            broadcastOCRText(recognizedText)
+            broadcastText(recognizedText, 'desktopOCR')
         })
     }
 })
@@ -134,7 +133,7 @@ function doAutoSubtitleCapture() {
         performOcr(scrsFile, (text) => {
             console.log('Auto-subtitle OCR text:', text)
 
-            broadcastOCRTextForAutoSubtitle(text)
+            broadcastText(text, 'autoSubtitle')
 
             fs.unlink(scrsFile, (unlinkErr) => {
                 if (unlinkErr) {
@@ -142,12 +141,6 @@ function doAutoSubtitleCapture() {
                 }
             })
         })
-    })
-}
-
-function broadcastOCRTextForAutoSubtitle(text: string) {
-    sseClients.forEach((client) => {
-        client.write(`data: ${JSON.stringify({ autoSubtitle: text })}\n\n`)
     })
 }
 
