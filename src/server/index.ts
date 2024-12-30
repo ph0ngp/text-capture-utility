@@ -6,6 +6,36 @@ import os from 'os';
 import fs from 'fs';
 import { exec } from 'child_process';
 
+
+function performOcr(imagePath: string, callback: (text: string) => void) {
+  const command = `mac-ocr file "${imagePath}"`;
+  exec(command, (error, stdout, stderr) => {
+    if (error) {
+      console.error('Error running mac-ocr:', error);
+      callback('');
+      return;
+    }
+    if (stderr) {
+      console.error('mac-ocr stderr:', stderr);
+    }
+
+    // Example output:
+    // OCR 识别结果 (2024-12-30 08:54:52):
+    // {actual text here}
+    // So let's split and skip the first line:
+    const lines = stdout.trim().split('\n');
+    // lines[0] is the "OCR 识别结果 (2024-12-30 08:54:52):"
+    // The rest is the actual recognized text
+    let recognizedText = lines.slice(1).join('\n').trim();
+
+    // If there's any additional formatting or cleaning you want:
+    // e.g. remove blank lines, remove trailing spaces, etc.
+    // recognizedText = recognizedText.replace(/\s+$/, '');
+
+    callback(recognizedText);
+  });
+}
+
 const app = express();
 app.use(cors());
 app.use(express.json());
@@ -57,22 +87,10 @@ fs.watch(desktopPath, (eventType, filename) => {
     // Make sure the file actually exists (fs.watch can be triggered on remove, too)
     if (!fs.existsSync(screenshotFilePath)) return;
 
-    // Run the Shortcut
-    const command = `shortcuts run ocr-text -i "${screenshotFilePath}"`;
-    exec(command, (error, stdout, stderr) => {
-      if (error) {
-        console.error('Error running OCR shortcut:', error);
-        return;
-      }
-      if (stderr) {
-        console.error('OCR shortcut stderr:', stderr);
-      }
-
-      const ocrText = stdout.trim();
-      console.log('Received OCR text:', ocrText);
-
+    performOcr(screenshotFilePath, (recognizedText) => {
+      console.log('Received OCR text:', recognizedText);
       // Broadcast to all SSE listeners
-      broadcastOCRText(ocrText);
+      broadcastOCRText(recognizedText);
     });
   }
 });
@@ -114,27 +132,16 @@ function doAutoSubtitleCapture() {
       return;
     }
 
-    const ocrCmd = `shortcuts run ocr-text -i "${scrsFile}"`;
-    exec(ocrCmd, (ocrErr, stdout, stderr) => {
-      if (ocrErr) {
-        console.error('Error running OCR on region screenshot:', ocrErr);
-        return;
-      }
-      if (stderr) {
-        console.error('OCR error output:', stderr);
-      }
 
-      const text = stdout.trim();
+    // Now run mac-ocr
+    performOcr(scrsFile, (text) => {
+      console.log('Auto-subtitle OCR text:', text);
 
-      // Broadcast to SSE
       broadcastOCRTextForAutoSubtitle(text);
 
-      // Delete the temporary file
       fs.unlink(scrsFile, (unlinkErr) => {
         if (unlinkErr) {
-          // Not a big deal if the file is already gone,
-          // but let's log it in case there's another issue.
-          console.warn(`Failed to remove ${scrsFile}:`, unlinkErr);
+          console.warn('Failed to remove', scrsFile, unlinkErr);
         }
       });
     });
@@ -160,7 +167,7 @@ app.post('/api/auto-subtitle', (req, res) => {
   if (autoSubtitleOn) {
     // Start the periodic capture if not already started
     if (!autoSubtitleInterval) {
-      autoSubtitleInterval = setInterval(doAutoSubtitleCapture, 1000); 
+      autoSubtitleInterval = setInterval(doAutoSubtitleCapture, 200); 
       // capture every 2s, or choose your interval
     }
   } else {
