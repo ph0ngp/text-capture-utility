@@ -67,34 +67,36 @@ export default function App() {
   };
 
   return (
-    <div style={{ padding: '1rem' }}>
-      <h1>Latest OCR Text from ~/Desktop Screenshots</h1>
-      <pre>{latestText}</pre>
+    <div>
+      {/* <h1>Latest OCR Text from ~/Desktop Screenshots</h1> */}
+      <pre className="reader_class">{latestText}</pre>
 
-      <h2>Auto Subtitle Mode</h2>
-      <label>
-        X:
-        <input type="number" value={x} onChange={(e) => setX(Number(e.target.value))} />
-      </label>
-      <label>
-        Y:
-        <input type="number" value={y} onChange={(e) => setY(Number(e.target.value))} />
-      </label>
-      <label>
-        Width:
-        <input type="number" value={w} onChange={(e) => setW(Number(e.target.value))} />
-      </label>
-      <label>
-        Height:
-        <input type="number" value={h} onChange={(e) => setH(Number(e.target.value))} />
-      </label>
+      {/* <h2>Auto Subtitle Mode</h2> */}
+      <div>
+        <label>
+            X:
+            <input type="number" value={x} onChange={(e) => setX(Number(e.target.value))} />
+        </label>
+        <label>
+            Y:
+            <input type="number" value={y} onChange={(e) => setY(Number(e.target.value))} />
+        </label>
+        <label>
+            Width:
+            <input type="number" value={w} onChange={(e) => setW(Number(e.target.value))} />
+        </label>
+        <label>
+            Height:
+            <input type="number" value={h} onChange={(e) => setH(Number(e.target.value))} />
+        </label>
 
-      <button onClick={toggleAutoSubtitle}>
-        {autoSubtitleOn ? 'Turn OFF Auto Subtitle' : 'Turn ON Auto Subtitle'}
-      </button>
+        <button onClick={toggleAutoSubtitle}>
+            {autoSubtitleOn ? 'Turn OFF Auto Subtitle' : 'Turn ON Auto Subtitle'}
+        </button>
+      </div>
 
-      <h3>Auto Subtitle OCR Text</h3>
-      <pre>{autoSubtitleText}</pre>
+      {/* <h3>Auto Subtitle OCR Text</h3> */}
+      <pre className="reader_class">{autoSubtitleText}</pre>
     </div>
   );
 }
