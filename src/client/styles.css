@@ -3,9 +3,9 @@
     src: url('/static/fonts/simkai.ttf') format('truetype');
     font-weight: normal;
     font-style: normal;
-  }
-  
-  .reader_class {
+}
+
+.reader_class {
     font-size: 50px;
     font-family: 'simkai', sans-serif; /* fallback to sans-serif */
     text-align: center;
@@ -13,5 +13,4 @@
     height: 100%;
     margin: 0;
     padding: 0;
-  }
-  
+}
