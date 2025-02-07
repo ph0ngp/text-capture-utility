@@ -20,6 +20,9 @@ export default function App() {
     const [latestText, setLatestText] = useState('')
     const [autoSubtitleText, setAutoSubtitleText] = useState('')
 
+    // NEW: State variable to store the current clipboard text
+    const [currentClipboard, setCurrentClipboard] = useState('')
+
     // A ref to always hold the latest `autoSubtitleOn` value
     const autoSubtitleOnRef = useRef(autoSubtitleOn)
 
@@ -27,6 +30,16 @@ export default function App() {
     useEffect(() => {
         autoSubtitleOnRef.current = autoSubtitleOn
     }, [autoSubtitleOn])
+
+    // NEW: useEffect to poll the clipboard for changes
+    useEffect(() => {
+        const interval = setInterval(() => {
+            navigator.clipboard.readText()
+                .then(text => setCurrentClipboard(text))
+                .catch(err => console.error('Error reading clipboard:', err))
+        }, 500) // poll every 500ms (adjust as needed)
+        return () => clearInterval(interval)
+    }, [])
 
     // SSE setup
     useEffect(() => {
@@ -101,6 +114,7 @@ export default function App() {
     return (
         <div>
             <pre className="reader_class">{latestText}</pre>
+            <pre className="reader_class">{currentClipboard}</pre>
 
             {/* Auto-subtitle controls in a single horizontal line */}
             <div
