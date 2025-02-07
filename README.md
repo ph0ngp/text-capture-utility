@@ -1,3 +1,9 @@
+This is a web app that lets you screenshot a region, extract the text inside it and display it in a web page. It can also automatically extract text from a certain region and update it continuously.
+
+How to run:
+- prerequisites:
+    - pnpm
+    - mac-ocr (command line tool to extract text from image on MacOS)
 - open 2 terminals
     - in terminal 1, run `pnpm run start:server`
     - in terminal 2, run `pnpm run dev`
