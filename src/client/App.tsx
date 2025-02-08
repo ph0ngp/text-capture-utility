@@ -37,7 +37,7 @@ export default function App() {
             navigator.clipboard.readText()
                 .then(text => setCurrentClipboard(text))
                 .catch(err => console.error('Error reading clipboard:', err))
-        }, 500) // poll every 500ms (adjust as needed)
+        }, 200) // adjust as needed
         return () => clearInterval(interval)
     }, [])
 
